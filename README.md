@@ -1,11 +1,11 @@
-# BillyBot - HR Policy Chatbot
+# BillyBot - Knowledge Base Chatbot
 
-A modern HR policy chatbot with both React frontend and Streamlit interfaces, built with Ollama and Chroma for document retrieval and question answering.
+A modern knowledge base chatbot with both React frontend and Streamlit interfaces, built with Ollama and Chroma for document retrieval and question answering.
 
 ## Features
 
-- 🤖 **AI-Powered Chat**: Ask questions about HR policies using Ollama LLM
-- 📄 **PDF Upload**: Drag-and-drop interface for uploading policy documents
+- 🤖 **AI-Powered Chat**: Ask questions about knowledge base using Ollama LLM
+- 📄 **PDF Upload**: Drag-and-drop interface for uploading documents
 - ⚙️ **Configurable Settings**: Adjust models, chunk sizes, and retrieval parameters
 - 🎨 **Modern UI**: Beautiful, responsive interface built with React and Tailwind CSS
 - 🔍 **Vector Search**: Powered by Chroma for semantic document retrieval
@@ -81,12 +81,12 @@ A modern HR policy chatbot with both React frontend and Streamlit interfaces, bu
 ## Usage
 
 ### React Frontend
-1. **Upload PDFs**: Go to the "Upload PDFs" tab and drag-and-drop your HR policy documents
+1. **Upload PDFs**: Go to the "Upload PDFs" tab and drag-and-drop your documents
 2. **Configure Settings**: Adjust model settings, chunk sizes, and retrieval parameters in the sidebar
-3. **Ask Questions**: Switch to the "Ask Questions" tab and start chatting with the AI about your policies
+3. **Ask Questions**: Switch to the "Ask Questions" tab and start chatting with the AI about your knowledge base
 
 ### Streamlit App
-1. **Upload Documents**: Use the file uploader to add HR policy documents
+1. **Upload Documents**: Use the file uploader to add documents
 2. **Ask Questions**: Type your questions in the chat interface
 3. **Configure Settings**: Adjust model and retrieval parameters as needed
 
@@ -155,7 +155,7 @@ The application supports various configuration options:
 - `frontend/src/` — React frontend source
 - `src/vector_store.py` — Vector DB manager (Chroma or FAISS) and embeddings setup
 - `src/chatbot.py` — Chat wrapper that calls the LLM
-- `data/` — Place to add HR documents
+- `data/` — Place to add documents
 
 ## 🚀 Deployment
 
@@ -166,7 +166,7 @@ The application supports various configuration options:
    ```bash
    git init
    git add .
-   git commit -m "Initial commit: BillyBot HR Policy Chatbot"
+   git commit -m "Initial commit: BillyBot Knowledge Base Chatbot"
    git branch -M main
    git remote add origin https://github.com/yourusername/billybot.git
    git push -u origin main
@@ -206,7 +206,7 @@ Run tests with pytest:
 1. Option for selecting models or LLMs through API integration
 2. Identity access management - User Role definition
 3. Settings or Configuration pages for this
-4. VectorDB from cloud
+4. Cloud VectorDB 
 5. Folder to upload docs (Or List of docs uploaded can be seen)
 6. Enhanced UI in React
 7. Multi-language support

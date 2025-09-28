@@ -59,7 +59,7 @@ const FileUpload = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Upload HR Policy PDFs
+          Upload Knowledge Base PDFs
         </h3>
         <p className="text-sm text-gray-600">
           Upload one or more PDF files to build your knowledge base

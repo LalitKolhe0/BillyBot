@@ -55,7 +55,7 @@ const ChatInterface = () => {
             Ask a Question
           </h3>
           <p className="text-sm text-gray-600">
-            Type your question about HR policies (e.g., "What is my sick leave policy?")
+            Type your question about your knowledge base (e.g., "What is the company policy on remote work?")
           </p>
         </div>
         {messages.length > 0 && (
@@ -75,7 +75,7 @@ const ChatInterface = () => {
             <div className="text-center">
               <Bot className="h-12 w-12 mx-auto mb-4 text-gray-400" />
               <p className="text-lg font-medium mb-2">Start a conversation</p>
-              <p className="text-sm">Ask me anything about your HR policies!</p>
+              <p className="text-sm">Ask me anything about your knowledge base!</p>
             </div>
           </div>
         ) : (

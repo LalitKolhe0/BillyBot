@@ -12,7 +12,7 @@ export const useSettings = () => {
 
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
-    persistDir: 'chroma_hr_db',
+    persistDir: 'chroma_kb_db',
     embeddingModel: 'nomic-embed-text',
     llmModel: 'llama3',
     topK: 4,

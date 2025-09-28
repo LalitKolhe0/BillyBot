@@ -15,7 +15,7 @@ const Header = () => {
                 BillyBot
               </h1>
               <p className="text-sm text-gray-500">
-                Policy Chatbot (Ollama + Chroma)
+                Knowledge Base Chatbot (Ollama + Chroma)
               </p>
             </div>
           </div>
