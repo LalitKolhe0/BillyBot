@@ -1,0 +1,9 @@
+streamlit>=1.20
+chromadb>=0.4
+langchain-core>=0.1
+langchain-chroma
+langchain-ollama
+langchain-community
+langchain-text-splitters
+ollama
+python-dotenv
