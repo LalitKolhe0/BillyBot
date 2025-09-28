@@ -1,6 +1,6 @@
-streamlit>=1.20
-chromadb>=0.4
-langchain>=0.1
+streamlit
+chromadb
+langchain
 langchain-chroma
 langchain-ollama
 langchain-community
