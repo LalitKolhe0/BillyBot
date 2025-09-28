@@ -4,6 +4,18 @@ import streamlit as st
 import tempfile
 from vector_store import VectorStoreManager
 from chatbot import answer_question
+import requests
+import json
+
+def get_ollama_models():
+    try:
+        response = requests.get("http://localhost:11434/api/tags")
+        if response.status_code == 200:
+            models = response.json().get("models", [])
+            return [model["name"] for model in models]
+        return ["phi3:mini"]
+    except:
+        return ["phi3:mini"]
 
 st.set_page_config(page_title=" Policy Chatbot", layout="wide")
 
@@ -12,7 +24,10 @@ st.title("🤖 Policy Chatbot (Ollama + Chroma)")
 st.sidebar.header("Settings")
 persist_dir = st.sidebar.text_input("Chroma persist directory", value="chroma_hr_db")
 embedding_model = st.sidebar.text_input("Ollama embedding model", value="nomic-embed-text")
-llm_model = st.sidebar.text_input("Ollama LLM model", value="llama3")
+
+available_models = get_ollama_models()
+llm_model = st.sidebar.selectbox("Ollama LLM model", available_models, index=0)
+
 top_k = st.sidebar.slider("Top-k retrieved chunks", 1, 10, 4)
 chunk_size = st.sidebar.number_input("Chunk size (chars)", value=1000)
 chunk_overlap = st.sidebar.number_input("Chunk overlap (chars)", value=150)
