@@ -1,5 +1,5 @@
 import os
-from authlib.integrations.fastapi_oauth2 import GoogleOAuth2, FacebookOAuth2
+from authlib.integrations.starlette_client import GoogleOAuth2, FacebookOAuth2
 from authlib.integrations.fastapi_oauth2 import AppleOAuth2
 
 # OAuth2 Configuration
