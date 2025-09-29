@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, X, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
-import { uploadFiles } from '../services/api';
+import { uploadFiles, clearDatabase } from '../services/api';
 
 const FileUpload = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   const { settings } = useSettings();
 
@@ -52,6 +53,30 @@ const FileUpload = () => {
       });
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleClearDatabase = async () => {
+    if (!window.confirm('Are you sure you want to clear the entire knowledge base? This action cannot be undone.')) {
+      return;
+    }
+
+    setIsClearing(true);
+    setUploadStatus(null);
+
+    try {
+      const response = await clearDatabase();
+      setUploadStatus({ 
+        type: 'success', 
+        message: response.message 
+      });
+    } catch (error) {
+      setUploadStatus({ 
+        type: 'error', 
+        message: error.response?.data?.detail || 'Failed to clear database' 
+      });
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -132,6 +157,33 @@ const FileUpload = () => {
           )}
         </button>
       )}
+
+      {/* Clear Database Button */}
+      <div className="border-t pt-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h4 className="text-sm font-medium text-gray-700">Database Management</h4>
+            <p className="text-xs text-gray-500">Clear all uploaded documents from the knowledge base</p>
+          </div>
+        </div>
+        <button
+          onClick={handleClearDatabase}
+          disabled={isClearing}
+          className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+        >
+          {isClearing ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Clearing Database...</span>
+            </>
+          ) : (
+            <>
+              <Trash2 className="h-4 w-4" />
+              <span>Clear Knowledge Base</span>
+            </>
+          )}
+        </button>
+      </div>
 
       {/* Status Message */}
       {uploadStatus && (

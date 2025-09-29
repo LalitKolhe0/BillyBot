@@ -1,8 +1,6 @@
 # BillyBot React Frontend Setup
 
-## 🎉 Your React frontend is ready!
 
-I've created a complete React frontend for your BillyBot Policy Chatbot with the following features:
 
 ### ✨ Features Implemented
 

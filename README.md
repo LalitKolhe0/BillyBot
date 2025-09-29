@@ -204,7 +204,7 @@ Run tests with pytest:
 ## Future Enhancements
 
 1. Option for selecting models or LLMs through API integration
-2. Identity access management - User Role definition
+2. Identity access management - User Role definition (enterprise structure, personal structure)
 3. Settings or Configuration pages for this
 4. Cloud VectorDB 
 5. Folder to upload docs (Or List of docs uploaded can be seen)

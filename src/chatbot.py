@@ -2,8 +2,8 @@
 from langchain_ollama import OllamaLLM
 
 SYSTEM_INSTRUCTION = (
-    "You are an internal HR assistant. Answer concisely using ONLY the provided policy "
-    "context. If the answer is not in the context, say you don't know and suggest contacting HR."
+    "You are an specific assistant. Answer concisely using ONLY the provided data from the knowledge base documents "
+    "context. If the answer is not in the context, say you don't know and suggest uploading the more relevant document."
 )
 
 def build_prompt(question: str, docs: list) -> str:

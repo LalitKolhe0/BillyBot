@@ -18,29 +18,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const uploadFiles = async (formData) => {
-  const response = await api.post('/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+export const loginUser = async (email, password) => {
+  const response = await api.post('/login', {
+    email,
+    password,
   });
   return response.data;
 };
 
-export const askQuestion = async (question, settings) => {
-  const response = await api.post('/ask', {
-    question,
-    settings,
+export const registerUser = async (email, username, password) => {
+  const response = await api.post('/register', {
+    email,
+    username,
+    password,
   });
   return response.data;
 };
 
-export const getHealth = async () => {
-  const response = await api.get('/health');
-  return response.data;
-};
-
-export const clearDatabase = async () => {
-  const response = await api.delete('/clear');
+export const getCurrentUser = async () => {
+  const response = await api.get('/me');
   return response.data;
 };
