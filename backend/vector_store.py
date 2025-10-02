@@ -13,11 +13,11 @@ from langchain_chroma import Chroma
 class VectorStoreManager:
     def __init__(
         self,
-        persist_directory: str = "chroma_hr_db",
+        persist_directory: str = "chroma_kb_db",
         embedding_model: str = "nomic-embed-text",  # make sure you pulled this with ollama
         chunk_size: int = 1000,
         chunk_overlap: int = 150,
-        collection_name: str = "hr_policies",
+        collection_name: str = "kb_documents",
     ):
         self.persist_directory = persist_directory
         self.embedding_model = embedding_model

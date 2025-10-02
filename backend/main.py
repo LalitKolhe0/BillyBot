@@ -22,8 +22,10 @@ from auth import (
     get_current_user,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
-from oauth_config import google_oauth, facebook_oauth, apple_oauth, GOOGLE_SCOPES, FACEBOOK_SCOPES, APPLE_SCOPES
-from oauth_service import create_or_get_social_user, get_social_user_info
+# Social logins (Google / Facebook / Apple) have been disabled per project configuration.
+# The oauth_config and oauth_service modules were removed/disabled to keep the main
+# authentication flow local (email/password + JWT). If you later want to re-enable
+# social logins, reintroduce the providers and their callback endpoints.
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -94,147 +96,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
     """Get current user information."""
     return current_user
 
-# OAuth2 Social Authentication Endpoints
-@app.get("/auth/google")
-async def google_login():
-    """Initiate Google OAuth2 login."""
-    redirect_uri = google_oauth.get_authorize_url(
-        redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:3000/auth/callback/google"),
-        scope=GOOGLE_SCOPES
-    )
-    return {"auth_url": redirect_uri}
-
-@app.get("/auth/facebook")
-async def facebook_login():
-    """Initiate Facebook OAuth2 login."""
-    redirect_uri = facebook_oauth.get_authorize_url(
-        redirect_uri=os.getenv("FACEBOOK_REDIRECT_URI", "http://localhost:3000/auth/callback/facebook"),
-        scope=FACEBOOK_SCOPES
-    )
-    return {"auth_url": redirect_uri}
-
-@app.get("/auth/apple")
-async def apple_login():
-    """Initiate Apple OAuth2 login."""
-    redirect_uri = apple_oauth.get_authorize_url(
-        redirect_uri=os.getenv("APPLE_REDIRECT_URI", "http://localhost:3000/auth/callback/apple"),
-        scope=APPLE_SCOPES
-    )
-    return {"auth_url": redirect_uri}
-
-@app.post("/auth/callback/google", response_model=Token)
-async def google_callback(code: str, db: Session = Depends(get_db)):
-    """Handle Google OAuth2 callback."""
-    try:
-        # Exchange code for token
-        token = google_oauth.get_access_token(
-            code=code,
-            redirect_uri=os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:3000/auth/callback/google")
-        )
-        
-        # Get user info from Google
-        user_info = google_oauth.get_user_info(token=token)
-        
-        # Extract user data
-        user_data = get_social_user_info("google", user_info)
-        
-        # Create or get user
-        user = create_or_get_social_user(
-            db=db,
-            email=user_data["email"],
-            provider="google",
-            provider_id=user_info.get("id"),
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"],
-            avatar_url=user_data["avatar_url"]
-        )
-        
-        # Create JWT token
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": str(user.id)}, expires_delta=access_token_expires
-        )
-        
-        return {"access_token": access_token, "token_type": "bearer"}
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Google authentication failed: {str(e)}")
-
-@app.post("/auth/callback/facebook", response_model=Token)
-async def facebook_callback(code: str, db: Session = Depends(get_db)):
-    """Handle Facebook OAuth2 callback."""
-    try:
-        # Exchange code for token
-        token = facebook_oauth.get_access_token(
-            code=code,
-            redirect_uri=os.getenv("FACEBOOK_REDIRECT_URI", "http://localhost:3000/auth/callback/facebook")
-        )
-        
-        # Get user info from Facebook
-        user_info = facebook_oauth.get_user_info(token=token)
-        
-        # Extract user data
-        user_data = get_social_user_info("facebook", user_info)
-        
-        # Create or get user
-        user = create_or_get_social_user(
-            db=db,
-            email=user_data["email"],
-            provider="facebook",
-            provider_id=user_info.get("id"),
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"],
-            avatar_url=user_data["avatar_url"]
-        )
-        
-        # Create JWT token
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": str(user.id)}, expires_delta=access_token_expires
-        )
-        
-        return {"access_token": access_token, "token_type": "bearer"}
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Facebook authentication failed: {str(e)}")
-
-@app.post("/auth/callback/apple", response_model=Token)
-async def apple_callback(code: str, db: Session = Depends(get_db)):
-    """Handle Apple OAuth2 callback."""
-    try:
-        # Exchange code for token
-        token = apple_oauth.get_access_token(
-            code=code,
-            redirect_uri=os.getenv("APPLE_REDIRECT_URI", "http://localhost:3000/auth/callback/apple")
-        )
-        
-        # Get user info from Apple
-        user_info = apple_oauth.get_user_info(token=token)
-        
-        # Extract user data
-        user_data = get_social_user_info("apple", user_info)
-        
-        # Create or get user
-        user = create_or_get_social_user(
-            db=db,
-            email=user_data["email"],
-            provider="apple",
-            provider_id=user_info.get("sub"),
-            first_name=user_data["first_name"],
-            last_name=user_data["last_name"],
-            avatar_url=user_data["avatar_url"]
-        )
-        
-        # Create JWT token
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": str(user.id)}, expires_delta=access_token_expires
-        )
-        
-        return {"access_token": access_token, "token_type": "bearer"}
-        
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Apple authentication failed: {str(e)}")
+# Social login endpoints removed
 
 @app.post("/upload")
 async def upload_files(

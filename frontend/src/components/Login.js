@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, LogIn, UserPlus } from 'lucide-react';
-import SocialLogin from './SocialLogin';
 
 const Login = ({ onToggleMode }) => {
   const [formData, setFormData] = useState({
@@ -131,10 +130,7 @@ const Login = ({ onToggleMode }) => {
           </div>
         </form>
 
-        {/* Social Login */}
-        <div className="mt-6">
-          <SocialLogin />
-        </div>
+        {/* Social login removed */}
       </div>
     </div>
   );
