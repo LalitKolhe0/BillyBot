@@ -2,8 +2,8 @@
 from langchain_ollama import OllamaLLM
 
 SYSTEM_INSTRUCTION = (
-    "You are an internal HR assistant. Answer concisely using ONLY the provided policy "
-    "context. If the answer is not in the context, say you don't know and suggest contacting HR."
+    "You are an internal knowledge base assistant. Answer concisely using ONLY the provided policy "
+    "context. If the answer is not in the context, say you don't know and suggest contacting more relevant documents."
 )
 
 def build_prompt(question: str, docs: list) -> str:
@@ -19,6 +19,7 @@ def build_prompt(question: str, docs: list) -> str:
         "Answer briefly. At the end, list sources used."
     )
     return prompt
+
 
 def answer_question(question: str, chroma_db, top_k: int = 4, model: str = "llama3", temperature: float = 0.0):
     docs = chroma_db.similarity_search(question, k=top_k)

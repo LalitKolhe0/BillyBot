@@ -14,6 +14,7 @@ const FileUpload = () => {
   const onDrop = useCallback((acceptedFiles) => {
     const pdfFiles = acceptedFiles.filter(file => file.type === 'application/pdf');
     setUploadedFiles(prev => [...prev, ...pdfFiles]);
+    setUploadStatus(null); // Clear previous status
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -44,12 +45,18 @@ const FileUpload = () => {
       formData.append('settings', JSON.stringify(settings));
 
       const response = await uploadFiles(formData);
-      setUploadStatus({ type: 'success', message: response.message });
+      setUploadStatus({ 
+        type: 'success', 
+        message: `${response.message} (Stored in: ${response.persist_directory})` 
+      });
       setUploadedFiles([]);
     } catch (error) {
+      const errorMessage = error.response?.data?.detail 
+        || error.message 
+        || 'Upload failed. Make sure the backend is running.';
       setUploadStatus({ 
         type: 'error', 
-        message: error.response?.data?.detail || 'Upload failed' 
+        message: errorMessage
       });
     } finally {
       setIsUploading(false);
@@ -68,12 +75,16 @@ const FileUpload = () => {
       const response = await clearDatabase();
       setUploadStatus({ 
         type: 'success', 
-        message: response.message 
+        message: response.message + (response.cleared_directories ? 
+          ` (Cleared: ${response.cleared_directories.join(', ')})` : '')
       });
     } catch (error) {
+      const errorMessage = error.response?.data?.detail 
+        || error.message 
+        || 'Failed to clear database';
       setUploadStatus({ 
         type: 'error', 
-        message: error.response?.data?.detail || 'Failed to clear database' 
+        message: errorMessage
       });
     } finally {
       setIsClearing(false);
@@ -84,122 +95,153 @@ const FileUpload = () => {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          Upload Knowledge Base PDFs
+          Upload PDFs
         </h3>
         <p className="text-sm text-gray-600">
-          Upload one or more PDF files to build your knowledge base
+          Drag and drop your PDF files here, or click to browse. Files will be processed and added to your knowledge base.
         </p>
       </div>
 
       {/* Dropzone */}
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragActive
-            ? 'border-primary-400 bg-primary-50'
+        className={`
+          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+          ${isDragActive 
+            ? 'border-primary-500 bg-primary-50' 
             : 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
-        }`}
+          }
+        `}
       >
         <input {...getInputProps()} />
-        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+        <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
         {isDragActive ? (
-          <p className="text-primary-600 font-medium">Drop the PDFs here...</p>
+          <p className="text-lg text-primary-600 font-medium">Drop the files here...</p>
         ) : (
-          <div>
-            <p className="text-gray-600 font-medium mb-2">
-              Drag & drop PDF files here, or click to select
+          <>
+            <p className="text-lg text-gray-700 font-medium mb-2">
+              Drag & drop PDF files here
             </p>
             <p className="text-sm text-gray-500">
-              Only PDF files are accepted
+              or click to select files from your computer
             </p>
-          </div>
+          </>
         )}
       </div>
 
-      {/* File List */}
+      {/* Uploaded Files List */}
       {uploadedFiles.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Selected Files:</h4>
-          {uploadedFiles.map((file, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <FileText className="h-5 w-5 text-red-500" />
-                <span className="text-sm font-medium text-gray-900">{file.name}</span>
-                <span className="text-xs text-gray-500">
-                  ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                </span>
-              </div>
-              <button
-                onClick={() => removeFile(index)}
-                className="text-gray-400 hover:text-red-500 transition-colors"
+          <h4 className="text-sm font-medium text-gray-700">
+            Files ready to upload ({uploadedFiles.length})
+          </h4>
+          <div className="space-y-2">
+            {uploadedFiles.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
               >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Upload Button */}
-      {uploadedFiles.length > 0 && (
-        <button
-          onClick={handleUpload}
-          disabled={isUploading}
-          className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isUploading ? (
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Ingesting PDFs...</span>
-            </div>
-          ) : (
-            'Ingest PDFs into Chroma'
-          )}
-        </button>
-      )}
-
-      {/* Clear Database Button */}
-      <div className="border-t pt-4">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h4 className="text-sm font-medium text-gray-700">Database Management</h4>
-            <p className="text-xs text-gray-500">Clear all uploaded documents from the knowledge base</p>
+                <div className="flex items-center space-x-3">
+                  <FileText className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                    <p className="text-xs text-gray-500">
+                      {(file.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => removeFile(index)}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                  aria-label="Remove file"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex space-x-4">
         <button
-          onClick={handleClearDatabase}
-          disabled={isClearing}
-          className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
+          onClick={handleUpload}
+          disabled={uploadedFiles.length === 0 || isUploading}
+          className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
         >
-          {isClearing ? (
+          {isUploading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span>Clearing Database...</span>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <span>Uploading...</span>
             </>
           ) : (
             <>
-              <Trash2 className="h-4 w-4" />
-              <span>Clear Knowledge Base</span>
+              <Upload className="h-5 w-5" />
+              <span>Upload Files</span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={handleClearDatabase}
+          disabled={isClearing || isUploading}
+          className="bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+        >
+          {isClearing ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              <span>Clearing...</span>
+            </>
+          ) : (
+            <>
+              <Trash2 className="h-5 w-5" />
+              <span>Clear DB</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Status Message */}
+      {/* Status Messages */}
       {uploadStatus && (
-        <div className={`p-4 rounded-lg flex items-center space-x-3 ${
-          uploadStatus.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div
+          className={`p-4 rounded-lg flex items-start space-x-3 ${
+            uploadStatus.type === 'success'
+              ? 'bg-green-50 border border-green-200'
+              : 'bg-red-50 border border-red-200'
+          }`}
+        >
           {uploadStatus.type === 'success' ? (
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
           )}
-          <span className="text-sm font-medium">{uploadStatus.message}</span>
+          <div className="flex-1">
+            <p
+              className={`text-sm font-medium ${
+                uploadStatus.type === 'success' ? 'text-green-800' : 'text-red-800'
+              }`}
+            >
+              {uploadStatus.type === 'success' ? 'Success!' : 'Error'}
+            </p>
+            <p
+              className={`text-sm mt-1 ${
+                uploadStatus.type === 'success' ? 'text-green-700' : 'text-red-700'
+              }`}
+            >
+              {uploadStatus.message}
+            </p>
+          </div>
         </div>
       )}
+
+      {/* Info Box */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p className="text-sm text-blue-800">
+          <strong>Note:</strong> Uploaded files will be processed and stored in the vector database. 
+          You can then ask questions about the content in the "Ask Questions" tab.
+        </p>
+      </div>
     </div>
   );
 };

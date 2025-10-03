@@ -8,6 +8,14 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
+from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
+from typing import List
+import os
+import shutil
+import tempfile
+import json
+
 
 
 class VectorStoreManager:
@@ -73,3 +81,11 @@ class VectorStoreManager:
     def get_relevant(self, query: str, k: int = 4):
         db = self.load_chroma()
         return db.similarity_search(query, k=k)
+
+
+    def clear_database(self):
+        if os.path.exists(self.persist_directory):
+            shutil.rmtree(self.persist_directory)
+            return {"message": "Knowledge base cleared successfully"}
+        else:
+            return {"message": "No database found to clear"}
