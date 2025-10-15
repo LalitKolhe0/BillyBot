@@ -103,17 +103,6 @@ A powerful Retrieval-Augmented Generation (RAG) chatbot built with LangChain, Ol
 **Alternative Interface:**
 - Streamlit - Rapid prototyping framework
 
----
-
-## 🎬 Demo
-
-### React Interface
-![React Interface](docs/images/react-interface.png)
-
-### Streamlit Interface
-![Streamlit Interface](docs/images/streamlit-interface.png)
-
-*(Add screenshots of your application here)*
 
 ---
 
