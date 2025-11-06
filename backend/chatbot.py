@@ -3,7 +3,7 @@ from langchain_ollama import OllamaLLM
 
 SYSTEM_INSTRUCTION = (
     "You are an internal knowledge base assistant. Answer concisely using ONLY the provided policy "
-    "context. If the answer is not in the context, say you don't know and suggest contacting more relevant documents."
+    "context. If the answer is not in the context, say you don't know and suggest uploading more relevant documents."
 )
 
 def build_prompt(question: str, docs: list) -> str:

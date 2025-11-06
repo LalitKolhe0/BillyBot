@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Header from './components/Header';
 import SettingsPanel from './components/SettingsPanel';
 import FileUpload from './components/FileUpload';
 import ChatInterface from './components/ChatInterface';
 import { SettingsProvider } from './context/SettingsContext';
+import Login from "./components/Login";
 
-function App() {
-  const [activeTab, setActiveTab] = useState('upload');
 
+
+const MainApp = () => {
+  const [activeTab, setActiveTab] = useState("upload");
   return (
     <SettingsProvider>
       <div className="min-h-screen bg-gray-50">
@@ -60,6 +68,30 @@ function App() {
         </div>
       </div>
     </SettingsProvider>
+  );
+}
+
+
+const PrivateRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("isLoggedIn");
+  return isLoggedIn ? children : <Navigate to="/" />;
+};
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route
+          path="/app"
+          element={
+            <PrivateRoute>
+              <MainApp />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
