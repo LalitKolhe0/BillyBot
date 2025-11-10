@@ -26,6 +26,7 @@ app.add_middleware(
 manager = None
 
 
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -40,6 +41,7 @@ async def upload_files(
     """
     Upload and ingest PDF files into the vector database
     """
+    global chroma_db 
     global manager
     
     temp_paths = []
@@ -54,6 +56,7 @@ async def upload_files(
             chunk_size=settings_dict.get("chunkSize", 1000),
             chunk_overlap=settings_dict.get("chunkOverlap", 150),
         )
+        chroma_db = None
         
         # Save uploaded files temporarily
         for file in files:
@@ -66,7 +69,7 @@ async def upload_files(
             temp_file.write(content)
             temp_file.close()
             temp_paths.append(temp_file.name)
-        
+
         # Ingest PDFs
         db = manager.ingest_pdfs(temp_paths, overwrite=False)
         
@@ -117,8 +120,11 @@ async def ask_question_endpoint(request: dict):
         settings_dict = request.get("settings", {})
         
         # Load Chroma database
-        chroma_db = manager.load_chroma()
+        global chroma_db
+        if not chroma_db:
+            chroma_db = manager.load_chroma()
         
+                
         # Get answer
         answer = answer_question(
             question, 
@@ -145,14 +151,14 @@ async def clear_database():
     
     try:
         # List of all possible database directories to clear
-        directories_to_clear = [
-            "chroma_kb_db"
-        ]
+        directories_to_clear = [ ]
         
         # If manager exists, add its persist directory and reset it
         if manager:
             directories_to_clear.append(manager.persist_directory)
             manager = None  # Reset the manager
+        else:
+            directories_to_clear.append("chroma_kb_db")
         
         # Remove duplicates and clear all directories
         cleared_dirs = []
