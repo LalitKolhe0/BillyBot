@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+
+
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +21,12 @@ const Login = () => {
       alert("Invalid credentials");
     }
   };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    navigate("/register");
+  };     
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -47,9 +57,20 @@ const Login = () => {
         >
           Login
         </button>
+                <p className="text-center mt-4 text-gray-600">Don't have an account?</p>
+        <button
+          type="button"
+          onClick={handleRegister}
+          className="w-full bg-gray-200 text-gray-800 py-2 mt-2 rounded hover:bg-gray-300"
+        >
+          Register
+        </button>
       </form>
     </div>
   );
 };
+
+
+
 
 export default Login;
