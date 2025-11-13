@@ -5,7 +5,6 @@ import FileUpload from './FileUpload';
 import ChatInterface from './ChatInterface';
 import { SettingsProvider } from '../context/SettingsContext';
 
-
 const MainApp = () => {
   const [activeTab, setActiveTab] = useState("upload");
   return (

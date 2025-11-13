@@ -1,5 +1,6 @@
 import React from 'react';
 import { Bot } from 'lucide-react';
+import LogOut from './LogOut';
 
 const Header = () => {
   return (
@@ -19,6 +20,7 @@ const Header = () => {
               </p>
             </div>
           </div>
+          <LogOut />
         </div>
       </div>
     </header>

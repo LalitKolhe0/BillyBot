@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { loginUser } from "../services/api"; 
 
 
 
@@ -12,21 +12,20 @@ const Login = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    // Basic check ( connect backend later)======================================******************************************
-    if (email === "admin@example.com" && password === "123456") {
+    try {
+      const response = loginUser(email, password);
+      localStorage.setItem("token", response.access_token);
       localStorage.setItem("isLoggedIn", "true");
       navigate("/app");
-    } else {
+    } catch (error) {
       alert("Invalid credentials");
-    }
+    }   
   };
 
   const handleRegister = (e) => {
     e.preventDefault();
     navigate("/register");
   };     
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

@@ -17,10 +17,12 @@ from auth import hash_password, verify_password, create_access_token, decode_acc
 
 app = FastAPI(title="BillyBot API", version="1.0.0")
 
+# Global manager instance
+manager = None
 # CORS middleware - Allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # React dev servers
+    allow_origins=["*"],  # React dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,14 +44,17 @@ async def health_check():
     return {"status": "healthy", "message": "BillyBot API is running"}
 
 
-@app.post("/signup")
-def signup(user: dict):
+#  Signup endpoint
+@app.post("/register")
+def register(user: dict):
     if users.find_one({"email": user["email"]}):
         raise HTTPException(status_code=400, detail="Email already registered")
     user["password"] = hash_password(user["password"])
+    print("Hashed password:", user["password"]) 
     users.insert_one(user)
     return {"message": "User created successfully"}
 
+#  Login endpoint
 @app.post("/login")
 def login(user: dict):
     db_user = users.find_one({"email": user["email"]})
@@ -58,6 +63,7 @@ def login(user: dict):
 
     token = create_access_token({"sub": str(db_user["_id"])})
     return {"access_token": token}
+
 
 # Upload file (requires JWT)
 @app.post("/upload")

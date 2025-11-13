@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { registerUser } from "../services/api"; 
 
 
 const Register = () => {
@@ -12,20 +12,15 @@ const Register = () => {
     const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = registerUser(email, password);
+      
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = response.json();
         throw new Error(errorData.message || 'Registration failed');
       }
 
-      const data = await response.json();
+      const data = response.json();
       console.log('Registration successful:', data);
       // Handle successful registration (e.g., redirect to login)
     } catch (err) {
