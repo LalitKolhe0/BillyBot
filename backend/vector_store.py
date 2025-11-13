@@ -41,7 +41,7 @@ class VectorStoreManager:
         )
 
     def ingest_pdfs(self, pdf_paths: List[str], overwrite: bool = False):
-        if overwrite and os.path.exists(self.persist_directory):
+        if overwrite and os.path.exists (self.persist_directory):
             import shutil
             shutil.rmtree(self.persist_directory)
 
