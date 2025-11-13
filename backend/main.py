@@ -6,17 +6,23 @@ import json
 from typing import List
 import uvicorn
 import shutil
-
 from vector_store import VectorStoreManager
 from chatbot import answer_question
+from pymongo import MongoClient
+from bson import ObjectId
+from auth import hash_password, verify_password, create_access_token, decode_access_token
+
+# authentication for all apis pending
 
 
 app = FastAPI(title="BillyBot API", version="1.0.0")
 
+# Global manager instance
+manager = None
 # CORS middleware - Allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],  # React dev servers
+    allow_origins=["*"],  # React dev servers
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,11 +31,60 @@ app.add_middleware(
 # Global manager instance
 manager = None
 
+# MongoDB setup
+client = MongoClient("mongodb://localhost:27017/")
+db = client["billybot"]
+users = db["users"]
+uploads = db["uploads"]
+
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "message": "BillyBot API is running"}
+
+
+#  Signup endpoint
+@app.post("/register")
+def register(user: dict):
+    if users.find_one({"email": user["email"]}):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    user["password"] = hash_password(user["password"])
+    print("Hashed password:", user["password"]) 
+    users.insert_one(user)
+    return {"message": "User created successfully"}
+
+#  Login endpoint
+@app.post("/login")
+def login(user: dict):
+    db_user = users.find_one({"email": user["email"]})
+    if not db_user or not verify_password(user["password"], db_user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    token = create_access_token({"sub": str(db_user["_id"])})
+    return {"access_token": token}
+
+
+# Upload file (requires JWT)
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...), token: str = ""):
+    payload = decode_access_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    user_id = payload.get("sub")
+    contents = await file.read()
+
+    uploads.insert_one({
+        "user_id": ObjectId(user_id),
+        "filename": file.filename,
+        "content_type": file.content_type,
+        "size": len(contents),
+    })
+
+    return {"message": "File uploaded successfully", "filename": file.filename}
+
+
 
 
 @app.post("/upload")
@@ -199,7 +254,7 @@ async def get_status():
 
 
 if __name__ == "__main__":
-    print("🚀 Starting BillyBot API Server...")
-    print("📍 Server will be available at: http://localhost:8000")
-    print("📚 API Documentation: http://localhost:8000/docs")
+    print(" Starting BillyBot API Server...")
+    print(" Server will be available at: http://localhost:8000")
+    print(" API Documentation: http://localhost:8000/docs")
     uvicorn.run(app, host="0.0.0.0", port=8000)

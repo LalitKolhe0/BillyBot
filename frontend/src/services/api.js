@@ -79,4 +79,17 @@ export const clearDatabase = async () => {
   return response.data;
 };
 
+/**
+ * Register a new user
+ */
+export const registerUser = async (email, password) => {
+  const response = await api.post('/register', { email, password });
+  return response.data;
+};
+
+export const loginUser = async (email, password) => {
+  const response = await api.post('/login', { email, password });
+  return response.data;
+}
+
 export default api;
