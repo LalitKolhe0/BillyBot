@@ -10,11 +10,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = loginUser(email, password);
-      localStorage.setItem("token", response.access_token);
+      const response = await loginUser(email, password);
+      if (!response.access_token) {
+        throw new Error('Login failed');
+      }
+      localStorage.setItem("token", response.access_token);   
       localStorage.setItem("isLoggedIn", "true");
       navigate("/app");
     } catch (error) {
