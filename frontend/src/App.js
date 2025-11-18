@@ -8,8 +8,8 @@ import {
 import Login from "./components/Login";
 import Register from "./components/Register";
 import MainApp from './components/MainApp';
-
-
+import Header from "./components/Header";
+import { ThemeProvider } from './context/ThemeContext';
 
 const PrivateRoute = ({ children }) => {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -18,13 +18,17 @@ const PrivateRoute = ({ children }) => {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/app" element={<PrivateRoute><MainApp /></PrivateRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <Header />
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/app" element={<PrivateRoute><MainApp /></PrivateRoute>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+          </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
