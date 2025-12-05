@@ -12,6 +12,7 @@ def build_prompt(question: str, docs: list) -> str:
         src = d.metadata.get("source", f"doc{i}")
         context_pieces.append(f"[{src}]\n{d.page_content}")
     context = "\n\n---\n\n".join(context_pieces)
+    print(context)  # Debug: Print the constructed context
     prompt = (
         f"{SYSTEM_INSTRUCTION}\n\n"
         f"CONTEXT:\n{context}\n\n"
